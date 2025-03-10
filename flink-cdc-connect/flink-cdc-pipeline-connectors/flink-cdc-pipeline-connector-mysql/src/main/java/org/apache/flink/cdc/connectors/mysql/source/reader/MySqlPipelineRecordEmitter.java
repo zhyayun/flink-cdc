@@ -33,6 +33,9 @@ import org.apache.flink.cdc.connectors.mysql.utils.MySqlTypeUtils;
 import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.connector.base.source.reader.RecordEmitter;
 
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.debezium.connector.mysql.antlr.MySqlAntlrDdlParser;
 import io.debezium.jdbc.JdbcConnection;
 import io.debezium.relational.Column;
@@ -42,8 +45,6 @@ import io.debezium.relational.TableId;
 import io.debezium.relational.Tables;
 import io.debezium.text.ParsingException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +60,7 @@ import static org.apache.flink.cdc.connectors.mysql.debezium.DebeziumUtils.openJ
 import static org.apache.flink.cdc.connectors.mysql.source.utils.RecordUtils.isLowWatermarkEvent;
 import static org.apache.flink.cdc.connectors.mysql.source.utils.TableDiscoveryUtils.listTables;
 
-/**
- * The {@link RecordEmitter} implementation for pipeline mysql connector.
- */
+/** The {@link RecordEmitter} implementation for pipeline mysql connector. */
 public class MySqlPipelineRecordEmitter extends MySqlRecordEmitter<Event> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MySqlPipelineRecordEmitter.class);
@@ -223,10 +222,7 @@ public class MySqlPipelineRecordEmitter extends MySqlRecordEmitter<Event> {
                 LOG.warn("Comment serialization failed, will skip it.", e);
             }
             tableBuilder.physicalColumn(
-                    colName,
-                    dataType,
-                    comment,
-                    column.defaultValueExpression().orElse(null));
+                    colName, dataType, comment, column.defaultValueExpression().orElse(null));
         }
         tableBuilder.comment(table.comment());
 
@@ -244,7 +240,6 @@ public class MySqlPipelineRecordEmitter extends MySqlRecordEmitter<Event> {
         mySqlAntlrDdlParser.parse(ddlStatement, tables);
         return tables.forTable(tableId);
     }
-
 
     private String removeQuotes(String str) {
         if (str != null && str.startsWith("\"") && str.endsWith("\"")) {
